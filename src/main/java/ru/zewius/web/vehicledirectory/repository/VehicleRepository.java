@@ -1,0 +1,10 @@
+package ru.zewius.web.vehicledirectory.repository;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import ru.zewius.web.vehicledirectory.entity.Vehicle;
+
+public interface VehicleRepository extends JpaRepository<Vehicle, String> {
+    @Query(value = "SELECT pg_size_pretty(pg_database_size(current_database()))", nativeQuery = true)
+    String getDatabaseSize();
+}
