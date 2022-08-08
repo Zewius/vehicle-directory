@@ -9,6 +9,7 @@ import org.springframework.web.context.request.WebRequest;
 import ru.zewius.web.vehicledirectory.exception.VehicleAlreadyExistException;
 import ru.zewius.web.vehicledirectory.exception.VehicleNotFoundException;
 
+import javax.validation.ConstraintViolationException;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 
@@ -17,7 +18,7 @@ import java.time.ZoneOffset;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(VehicleNotFoundException.class)
-    public ResponseEntity <ApiErrorResponse> vehicleNotFound(VehicleNotFoundException ex, WebRequest request) {
+    public ResponseEntity<ApiErrorResponse> vehicleNotFound(VehicleNotFoundException ex, WebRequest request) {
         log.info(request.toString());
         HttpStatus httpStatus = HttpStatus.NOT_FOUND;
         ApiErrorResponse apiResponse = new ApiErrorResponse
@@ -33,8 +34,25 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(VehicleAlreadyExistException.class)
-    public ResponseEntity <ApiErrorResponse> vehicleAlreadyExist(VehicleAlreadyExistException ex, WebRequest request) {
+    public ResponseEntity<ApiErrorResponse> vehicleAlreadyExist(VehicleAlreadyExistException ex, WebRequest request) {
+        log.info(request.toString());
         HttpStatus httpStatus = HttpStatus.METHOD_NOT_ALLOWED;
+        ApiErrorResponse apiResponse = new ApiErrorResponse
+                .ApiErrorResponseBuilder()
+                .timestamp(LocalDateTime.now(ZoneOffset.UTC))
+                .status(httpStatus.value())
+                .error(httpStatus.getReasonPhrase())
+                .detail("Entry did not pass validation")
+                .message(ex.getMessage())
+                .path(request.getContextPath())
+                .build();
+        return new ResponseEntity<>(apiResponse, httpStatus);
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ApiErrorResponse> vehicleValidationFailed(ConstraintViolationException ex, WebRequest request) {
+        log.info(request.toString());
+        HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
         ApiErrorResponse apiResponse = new ApiErrorResponse
                 .ApiErrorResponseBuilder()
                 .timestamp(LocalDateTime.now(ZoneOffset.UTC))

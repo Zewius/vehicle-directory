@@ -2,44 +2,58 @@ package ru.zewius.web.vehicledirectory.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.zewius.web.vehicledirectory.entity.Vehicle;
+import ru.zewius.web.vehicledirectory.data.Vehicle;
+import ru.zewius.web.vehicledirectory.data.VehicleToEntityMapper;
+import ru.zewius.web.vehicledirectory.entity.VehicleEntity;
 import ru.zewius.web.vehicledirectory.exception.VehicleAlreadyExistException;
 import ru.zewius.web.vehicledirectory.exception.VehicleNotFoundException;
 import ru.zewius.web.vehicledirectory.repository.VehicleRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class VehicleService {
 
-    private final VehicleRepository vehicleRepository;
+    private final VehicleRepository repository;
+    private final VehicleToEntityMapper mapper;
 
     @Autowired
-    public VehicleService(VehicleRepository vehicleRepository) {
-        this.vehicleRepository = vehicleRepository;
+    public VehicleService(VehicleRepository repository, VehicleToEntityMapper mapper) {
+        this.repository = repository;
+        this.mapper = mapper;
     }
 
     public List<Vehicle> findAll() {
-        return vehicleRepository.findAll();
+        Iterable<VehicleEntity> iterable = repository.findAll();
+        List<Vehicle> vehicles = new ArrayList<>();
+
+        for (VehicleEntity vehicleEntity : iterable) {
+            vehicles.add(mapper.vehicleEntityToVehicle(vehicleEntity));
+        }
+
+        return vehicles;
     }
 
     public Vehicle findById(String id) throws VehicleNotFoundException {
-        return vehicleRepository.findById(id).orElseThrow(() -> new VehicleNotFoundException(id));
+        VehicleEntity vehicleEntity = repository.findById(id).orElseThrow(() -> new VehicleNotFoundException(id));
+        return mapper.vehicleEntityToVehicle(vehicleEntity);
     }
 
     public Vehicle save(Vehicle vehicle) throws VehicleAlreadyExistException {
         String id = vehicle.getRegistrationNumber();
 
-        if (vehicleRepository.existsById(id)) {
+        if (repository.existsById(id)) {
             throw new VehicleAlreadyExistException(id);
         }
 
-        return vehicleRepository.save(vehicle);
+        repository.save(mapper.vehicleToVehicleEntity(vehicle));
+
+        return vehicle;
     }
 
-    public Vehicle deleteById(String id) throws VehicleNotFoundException {
-        Vehicle deletedVehicle = vehicleRepository.findById(id).orElseThrow(() -> new VehicleNotFoundException(id));
-        vehicleRepository.deleteById(id);
-        return deletedVehicle;
+    public void deleteById(String id) throws VehicleNotFoundException {
+        VehicleEntity deletedVehicleEntity = repository.findById(id).orElseThrow(() -> new VehicleNotFoundException(id));
+        repository.delete(deletedVehicleEntity);
     }
 }

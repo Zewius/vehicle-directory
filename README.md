@@ -1,104 +1,72 @@
-<h1>Справочник автомобилей / Vehicle directory</h1>
-<p>
+# Автомобильный справочник / Vehicle directory
+
 REST-сервис, предоставляющий информацию о транспортных средствах из базы данных.
 
-Написан на языке Java, используются такие технологии как Spring Framework 
-(Spring Data JPA, Spring Web, Spring HATEOAS) и БД PostgreSQL.
+Написан на языке Java, используются такие технологии как [Spring Framework](https://spring.io) 
+([Spring Data](https://spring.io/projects/spring-data), [Spring Web](https://spring.io/projects/spring-framework), 
+[Spring HATEOAS](https://spring.io/projects/spring-hateoas)), [Spring Boot](https://spring.io/projects/spring-boot) 
+и СУБД [PostgreSQL](https://www.postgresql.org).
 
-Был выполнен в качестве тестового задания от компании "Эмбедика"</p>
+Был выполнен в качестве тестового задания от компании "Эмбедика".
 
-<h2>Настройка</h2>
-<h3>База данных</h3>
-Прежде чем запустить программу, необходимо создать базу данных и таблицу.
+## Настройка
+
+### База данных
+
+Прежде чем запустить программу, необходимо создать базу данных и таблицу. 
 В качестве базы данных используется БД PostgreSQL.
 
 Создание таблицы:
 
-<code>
-CREATE TABLE IF NOT EXISTS vehicle_list (reg_number varchar(9) not null primary key,
-	brand varchar(15) not null,
-	color varchar(20) not null,
-	production_year int not null)
-</code>
+```postgresql
+CREATE TABLE IF NOT EXISTS vehicle_list (
+reg_number      VARCHAR(9)  NOT NULL PRIMARY KEY,
+brand           VARCHAR(15) NOT NULL,
+color           VARCHAR(20) NOT NULL,
+production_year INT         NOT NULL);
+```
 
-<h3>Spring Boot</h3>
+### Spring Boot
 
-После того как таблица была создана, необходимо внести свои изменения в файле
-<b>application.properties</b>. В этом файле нужно указать:
-<ol>
-    <li>spring.datasource.url - адрес базы данных;</li>
-    <li>spring.datasource.username - имя пользователя PostgreSQL;</li>
-    <li>spring.datasource.password - пароль.</li>
-</ol>
+После того как таблица была создана, необходимо внести свои изменения в файле **application.properties**. 
+В этом файле нужно указать:
 
-<h2>API</h2>
-<h3>Основные методы</h3>
-<table>
-    <tr>
-        <td>Метод</td>
-        <td>Описание</td>
-        <td>Параметры</td>
-        <td>Возвращаемый результат</td>
-    </tr>
-    <tr>
-        <td>GET localhost:8080/api/vehicles</td>
-        <td>Получения списка всех автомобилей</td>
-        <td>Нет параметров</td>
-        <td>Список всех объектов</td>
-    </tr>
-    <tr>
-        <td>GET localhost:8080/api/vehicles/{ID}</td>
-        <td>Получение информации об автомобиле с номером ID</td>
-        <td>Нет параметров</td>
-        <td>Объект</td>
-    </tr>
-    <tr>
-        <td>POST localhost:8080/api/vehicles</td>
-        <td>Добавление автомобиля</td>
-        <td>JSON с параметрами объекта - регистрационный номер, марка, 
-        цвет и год выпуска</td>
-        <td>Результат операции</td>
-    </tr>
-    <tr>
-        <td>DELETE localhost:8080/api/vehicles/{ID}</td>
-        <td>Удаление автомобиля с номером ID</td>
-        <td>Нет параметров</td>
-        <td>Результат операции</td>
-    </tr>
-</table>
-<h3>Служебные методы</h3>
-<table>
-    <tr>
-        <td>Метод</td>
-        <td>Описание</td>
-        <td>Параметры</td>
-        <td>Возвращаемый результат</td>
-    </tr>
-    <tr>
-        <td>GET localhost:8080/api/status</td>
-        <td>Получение информации о базе данных: количество записей 
-        и занимаемый объем памяти</td>
-        <td>Нет параметров</td>
-        <td>Объект с полями: numberOfEntries, databaseSize</td>
-    </tr>
-</table>
-<h3>Формат данных</h3>
-<p>
-Пример: <b>GET localhost:8080/api/vehicles/{ID}</b>
-</p>
-<code>
+1. spring.datasource.url - адрес базы данных;
+2. spring.datasource.username - имя пользователя PostgreSQL;
+3. spring.datasource.password - пароль.
+
+## API
+
+### Основные методы
+
+|                    Метод                    |                      Описание                      |                                   Параметры                                   | Возвращаемый результат  |
+|:-------------------------------------------:|:--------------------------------------------------:|:-----------------------------------------------------------------------------:|:-----------------------:|
+|     GET<br/>localhost:8080/api/vehicles     |         Получения списка всех автомобилей          |                                Нет параметров                                 |  Список всех объектов   |
+|  GET<br/>localhost:8080/api/vehicles/{ID}   | Получение информации об автомобиле с номером _ID_  |                                Нет параметров                                 |  Объект с номером _ID_  |
+|    POST<br/>localhost:8080/api/vehicles     |               Добавление автомобиля                | JSON с параметрами объекта - регистрационный номер, марка, цвет и год выпуска |   Результат операции    |
+| DELETE<br/>localhost:8080/api/vehicles/{ID} |         Удаление автомобиля с номером _ID_         |                                Нет параметров                                 |   Результат операции    |
+
+### Служебные методы
+
+|               Метод                |                                     Описание                                     |   Параметры    |             Возвращаемый результат              |
+|:----------------------------------:|:--------------------------------------------------------------------------------:|:--------------:|:-----------------------------------------------:|
+| GET<br/>localhost:8080/api/status  | Получение информации о базе данных: количество записей и занимаемый объем памяти | Нет параметров | Объект с полями: numberOfEntries, databaseSize  |
+
+### Формат данных
+
+Пример: **GET localhost:8080/api/vehicles/{ID}**
+
+```json
 {
     "registrationNumber": "А999АА999",
     "brand": "Tesla",
     "color": "Blue",
     "productionYear": 2018
 }
-</code>
-<ol>
-    <li>registrationNumber - регистрационный номер автомобиля 
-        российского образца (используется кириллица);</li>
-    <li>brand - торговая марка автомобиля;</li>
-    <li>color - цвет автомобиля;</li>
-    <li>productionYear - год выпуска автомобиля</li>
-</ol>
+```
+
+1. registrationNumber - регистрационный номер автомобиля российского образца (используется кириллица);
+2. brand - торговая марка автомобиля;
+3. color - цвет автомобиля;
+4. productionYear - год выпуска автомобиля
 
