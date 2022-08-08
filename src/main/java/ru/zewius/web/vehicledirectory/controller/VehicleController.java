@@ -8,7 +8,7 @@ import org.springframework.hateoas.server.LinkBuilder;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.zewius.web.vehicledirectory.entity.Vehicle;
+import ru.zewius.web.vehicledirectory.data.Vehicle;
 import ru.zewius.web.vehicledirectory.service.VehicleService;
 
 import javax.validation.Valid;
